@@ -31,9 +31,9 @@ class SeriesPredictor():
 
 	def _build(self):
 		model = tf.keras.Sequential([
-			layers.LSTM(128, input_shape = (2, 100), return_sequences=False), # if next layer is Dense, dont' use return_sequences!
+			layers.LSTM(128, input_shape = (5, 150), return_sequences=False), # if next layer is Dense, dont' use return_sequences!
 			#layers.LSTM(150, return_sequences=False),
-			layers.Dense(100),
+			layers.Dense(150),
 		])
 		# optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
 		model.compile(optimizer='sgd',
