@@ -57,7 +57,7 @@ class SequentialDataset():
 	def _parse_args(self):
 		args = dict()
 		args["path"] = self.configs["path"]
-		args["history"] = 5 # history window size
+		args["history"] = 25 # history window size
 		args["step"] = 1 # steps in the future
 		args["target"] = 1 # forcast window size
 		self.args = args

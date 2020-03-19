@@ -31,15 +31,16 @@ class SeriesPredictor():
 
 	def _build(self):
 		model = tf.keras.Sequential([
-			layers.LSTM(128, input_shape = (5, 150), return_sequences=False), # if next layer is Dense, dont' use return_sequences!
-			#layers.LSTM(150, return_sequences=False),
+			layers.LSTM(128, input_shape = (25, 150), return_sequences=False), # if next layer is Dense, dont' use return_sequences!
+			#layers.LSTM(100, return_sequences=False),
 			layers.Dense(150),
 		])
-		# optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-		model.compile(optimizer='sgd',
+		optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
+		model.compile(optimizer=optimizer,#'sgd',
               # loss=tf.keras.losses.BinaryCrossentropy(),
               loss = 'mean_squared_error',
-              metrics=['accuracy'])
+              #metrics=['accuracy'],
+		)
 		self.model = model
 
 	def _callback(self):
@@ -69,11 +70,11 @@ class SeriesPredictor():
 		self.callbacks = [cp_callback_train, cp_callback_val, tb_callback]
 
 	def _train(self):
-		self.model.fit(self.train_set,
+		self.model.fit(self.train_set.repeat(),
 		          validation_data=self.valid_set,
 		          validation_freq=1,
-		          # steps_per_epoch = 50,
-		          epochs=100,
+		          steps_per_epoch = 50,
+		          epochs=500,
                   	callbacks = self.callbacks,
 		          )
 	def _save(self):
