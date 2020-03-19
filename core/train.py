@@ -31,8 +31,8 @@ class SeriesPredictor():
 
 	def _build(self):
 		model = tf.keras.Sequential([
-			layers.LSTM(128, input_shape = (2, 100), return_sequences=False), # if next layer is Dense, dont' use return_sequences!	
-			# layers.LSTM(128),
+			layers.LSTM(128, input_shape = (2, 100), return_sequences=False), # if next layer is Dense, dont' use return_sequences!
+			#layers.LSTM(150, return_sequences=False),
 			layers.Dense(100),
 		])
 		# optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
@@ -69,7 +69,7 @@ class SeriesPredictor():
 		self.callbacks = [cp_callback_train, cp_callback_val, tb_callback]
 
 	def _train(self):
-		self.model.fit(self.train_set.take(10),
+		self.model.fit(self.train_set,
 		          validation_data=self.valid_set,
 		          validation_freq=1,
 		          # steps_per_epoch = 50,

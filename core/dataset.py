@@ -9,8 +9,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from util import *
 
-# classifier takes individual values as input
-
 class SequentialDataset():
 	"""
 	only sequential data need files as input
@@ -59,7 +57,7 @@ class SequentialDataset():
 	def _parse_args(self):
 		args = dict()
 		args["path"] = self.configs["path"]
-		args["history"] = 2 # history window size
+		args["history"] = 5 # history window size
 		args["step"] = 1 # steps in the future
 		args["target"] = 1 # forcast window size
 		self.args = args
@@ -85,13 +83,13 @@ class SequentialDataset():
 		def parse_file(file):
 			ds = tf.data.TextLineDataset(file)
 			ds = ds.skip(1) # skip the 1st line
-			ds = ds.take(100)
+			ds = ds.take(100) # 100
 			def parse_line(line):
 				val_str = tf.strings.split(line)
 				val = tf.strings.to_number(val_str[1], out_type=tf.dtypes.float32)
 				return val
-			ds = ds.map(parse_line).batch(150)
-			ds = ds.map(lambda x : tf.reshape(x, [100,]))
+			ds = ds.map(parse_line).batch(100)
+			ds = ds.map(lambda x : tf.reshape(x, [150,])) # 100
 			# ds = ds.map(lambda *lines : tf.stack(lines)) # this one only work for csv rows
 			return ds # this is still a dataset
 
@@ -113,7 +111,7 @@ class SequentialDataset():
 			return data, label
 		dataset = dataset.map(divide_train_label)
 
-		dataset = dataset.batch(20)
+		#dataset = dataset.batch(20)
 		dataset = dataset.cache().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 		return dataset
 
