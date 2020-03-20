@@ -13,6 +13,7 @@ class SeriesPredictor():
 	def __call__(self):
 		self._ds()
 		self._build()
+		self.model.summary()
 		self._callback()
 		self._train()
 		self._save()
@@ -31,9 +32,18 @@ class SeriesPredictor():
 
 	def _build(self):
 		model = tf.keras.Sequential([
-			layers.LSTM(30, input_shape = (50, 150), return_sequences=True), # if next layer is Dense, dont' use return_sequences!
-			layers.LSTM(20, return_sequences=False),
-			layers.Dense(10),
+			layers.LSTM(100, 
+				input_shape = (50, 150), 
+				return_sequences=True, 
+				#recurrent_activation = 'tanh',
+				#dropout = 0.2,
+				#activation='relu'
+				), # if next layer is Dense, dont' use return_sequences!
+			layers.LSTM(50,
+				#activation='relu', 
+				return_sequences=True),
+			layers.LSTM(20,
+				return_sequences=False),
                         layers.Dense(150),
 		])
 		optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
@@ -47,14 +57,14 @@ class SeriesPredictor():
 	def _callback(self):
 		# checkpoints
 		cp_callback_train = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_rnn_dir+checkpoint_train_path,
-		        moniter = "acc",
+		        moniter = "loss",
 		        verbose=1,
 		        save_best_only = True,
 		        save_weights_only = False,
 		        mode = "max",
 		        save_freq="epoch")
 		cp_callback_val = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_rnn_dir+checkpoint_val_path,
-		        moniter = "val_acc",
+		        moniter = "val_loss",
 		        verbose=1,
 		        save_best_only = True,
 		        save_weights_only = False,
@@ -74,8 +84,8 @@ class SeriesPredictor():
 		self.model.fit(self.train_set.repeat(),
 		          validation_data=self.valid_set,
 		          validation_freq=1,
-		          steps_per_epoch = 50,
-		          epochs=500,
+		          steps_per_epoch = 80,
+		          epochs=200,
                   	callbacks = self.callbacks,
 		          )
 	def _save(self):

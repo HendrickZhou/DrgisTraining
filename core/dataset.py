@@ -62,14 +62,14 @@ class SequentialDataset():
 		args["target"] = 1 # forcast window size
 		self.args = args
 
-	def _split(self, fold = 10, k = 8, val = False):
+	def _split(self, fold = 10, k = 9, val = False):
 		# forward chaining split
 		paths = self.args["path"]
 
 		split_idx = int(len(paths) * k / fold) ############ unsafe here
 		end_idx = split_idx + 1 + self.args["step"] + self.args["target"] #split_idx included
 		if val:
-			val_idx = int(end_idx*0.75)
+			val_idx = int(end_idx*0.8)
 			train_path = paths[:val_idx]
 			val_path = paths[val_idx:end_idx]
 			test_path = paths[end_idx:]
@@ -97,7 +97,7 @@ class SequentialDataset():
 		dataset = tf.data.Dataset.from_tensor_slices(ds)
 		dataset = dataset.map(parse_file)
 		dataset = dataset.flat_map(lambda x: x) # now it's not dataset of dataset anymore
-
+		dataset = dataset.map(self._normalize_simple)		
 		def make_windows(dataset, shift = 1 , stride = 1):
 			win_size = self.args["history"] + self.args["target"] + self.args["step"] - 1
 			dataset = dataset.window(win_size, shift, stride)
@@ -111,11 +111,15 @@ class SequentialDataset():
 			return data, label
 		dataset = dataset.map(divide_train_label)
 
-		dataset = dataset.batch(50)
+		dataset = dataset.batch(10)
 		dataset = dataset.cache().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 		return dataset
 
-
+	@staticmethod
+	def _normalize_simple(element):
+		return (element-80)*0.01
+		
+		
 	@staticmethod
 	def _preprocess(element):
 		pass
