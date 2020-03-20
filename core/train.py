@@ -84,7 +84,7 @@ class SeriesPredictor():
 		self.model.fit(self.train_set.repeat(),
 		          validation_data=self.valid_set,
 		          validation_freq=1,
-		          steps_per_epoch = 80,
+		          steps_per_epoch = 40,
 		          epochs=200,
                   	callbacks = self.callbacks,
 		          )

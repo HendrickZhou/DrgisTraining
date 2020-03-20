@@ -29,7 +29,7 @@ class SequentialDataset():
 		self.configs = configs
 
 
-	def cache(self, fold = 10, k = 8, val = False):
+	def cache(self, fold = 10, k = 9, val = False):
 		self._parse_args()
 		self.ds = self._split(fold, k, val)
 		self.cached = True
@@ -98,7 +98,7 @@ class SequentialDataset():
 		dataset = dataset.map(parse_file)
 		dataset = dataset.flat_map(lambda x: x) # now it's not dataset of dataset anymore
 		dataset = dataset.map(self._normalize_simple)		
-		def make_windows(dataset, shift = 1 , stride = 1):
+		def make_windows(dataset, shift = 2, stride = 1):
 			win_size = self.args["history"] + self.args["target"] + self.args["step"] - 1
 			dataset = dataset.window(win_size, shift, stride)
 			def subset_batch(subset):
@@ -111,7 +111,7 @@ class SequentialDataset():
 			return data, label
 		dataset = dataset.map(divide_train_label)
 
-		dataset = dataset.batch(10)
+		dataset = dataset.batch(50)
 		dataset = dataset.cache().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 		return dataset
 
